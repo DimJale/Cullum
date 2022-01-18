@@ -1,0 +1,228 @@
+
+<html>
+    <head>
+        <tilte>// Random Play</title>
+        
+    </head>
+    
+    <body>
+        <br>
+
+        <div id="div1">
+
+        </div>
+    </body>
+
+    <script>
+
+
+        
+function getRndm(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
+  }
+
+
+function makeStory(){
+
+var wholeStory = [];
+var wholeCast = [];
+var sceneStats = {
+    Scns : 24,
+    Chptrs : 6,
+
+    Rng : 5,
+};
+sceneStats.Chars = sceneStats.Chptrs * 2;
+sceneStats.MnChars = getRndm(2, sceneStats.Chptrs);
+
+var firstNames = [
+    "Lester","Nanne","Portia","Simon","Clarissa","Norbert","Odessa",
+    "Frances","Garth","Partrice","Sam","Corinth","Freda","Miss",
+    "Mister","Myrtle","Dick","Cherry","Ida","Uncle","Aunt","Torsten",
+    "Edmond","Fitz","Randy","Mariah","Shirley","Lucy","Khan","Zeus",
+    "Buffy","Triff","Gamorah","Agent"
+];
+var lastNames = [
+    "McDoogs","Sabotage","Flesh","Speller","Cannot","Bowls","Wrong","Nation",
+    "Bonus","Triple","Bunches","Stunkt","Garlik","Hourly","Sorted","Listen",
+    "Ropeman","Lunch", "Fork","Criminal","VegaWatt","Witness","Gossip","Tropical",
+    "de Leon","Sandwich","Decibel","Luster","Coupon","Windows","TallGrass",
+    "Airborne","Impact","Oldham","Sacred","Sucker","Tucker","Close","Far",
+    "Snickers","the Third","Time"
+];
+var charInacts = [
+    "shuffles their feet","listens","mumbles something","clears their throat",
+    "hums","watches","wrestles internally","thinks back",
+    "continues to deliberate","chuckles","sniffs a bit","rolls their head",
+    "crosses their arms", "dusts their sleeves"
+];
+var charDial = [
+    "demands clarification","makes a declaration","calls out","responds",
+    "quickly responds","snaps back","shouts","explains","tediously explains",
+    "forcefully responds","states a fact","exclaims","lies",
+    "tries to redirect the conversation","speaks through laughter",
+    "casually implies","makes an innuendo","theorizes aloud","stares, head tilted"
+];
+var charMove = [
+    "nods, yes","shakes, no","dances around","starts upright","sits down",
+    "gets up","wipes their eye","affirms with a hand gesture","gestures",
+    "walks across the room","rubs their stomach","massages their temples",
+    "shakes their hand","screws their face up","puts their head in their hands",
+    "looks from one person to the next","slams their fist down",
+    "licks their lips","throws their head back","produces their evidence",
+    "cranes their kneck"
+];
+var sceneNotes = [
+    " The light shifts."," A sound is heard."," A distant sound rises and fades.",
+    " The mood of the room swings."," An object is revealed.",
+    " Music begins in an adjacent room."," Someone walks by the window.",
+    " A door slams."," The furniture is moved."," Someone laughs.",
+    " Someone quietly cries."
+];
+
+///build characters
+var mainCharArray = [];
+var sideCharArray = [];
+
+for (i = sceneStats.MnChars; i > 0; i--){
+    let name = firstNames[getRndm(0, firstNames.length - 1)] + " " + lastNames[getRndm(0, lastNames.length - 1)];
+    let interactivity = getRndm(1, 5);
+    mainCharArray.push([name, interactivity]);
+};
+for (i = (sceneStats.Chars - sceneStats.MnChars); i > 0; i--){
+    let name = firstNames[getRndm(0, firstNames.length - 1)] + " " + lastNames[getRndm(0, lastNames.length - 1)];
+    let interactivity = getRndm(1, 5);
+    sideCharArray.push([name, interactivity]);
+};
+
+///build scene
+var sceneArray = [];
+
+let chptLength = 3;
+let runTotal = 1;
+let prevNum = 1;
+let chptNum = 1;
+
+
+for (i = 0; i < sceneStats.Chptrs; i++){
+    let newNum = getRndm(prevNum, sceneStats.Rng); //newNum is a scene rating
+    if (newNum == sceneStats.Rng){
+        prevNum = 1;
+    };
+
+    //build a stack of characters for the scene
+    let scnChars = [];
+
+    let scnCharStrt = getRndm(2, sceneStats.Chptrs+1);
+    let scnMnStrt = getRndm(2, mainCharArray.length-1);
+    let scnSdStrt = scnCharStrt - scnMnStrt + 1;
+    if (scnMnStrt > 0){
+        for (j = scnMnStrt; j > 0; j--){
+            scnChars.push(mainCharArray[j-1]);
+        };
+    };
+    for (k = scnSdStrt; k > 0; k--){
+        scnChars.push(sideCharArray[k-1]);
+    };
+
+    ///actions/pacing///
+
+    let scnText = " ";
+    let currentChars = 3; ///Math.floor(scnChars.length/2);
+    let actionRounds = getRndm(4,7);
+
+    //action round
+    function actionRnd() {
+        for (l = 0; l < currentChars-1; l++){
+            
+            actType = getRndm(1, 5) + scnChars[l][1];
+
+            let perform;
+            if (actType > 6) {
+                perform = charDial[getRndm(0, charInacts.length-1)];
+            } else if (actType < 4) {
+                perform = charMove[getRndm(0, charInacts.length-1)];
+            }else {
+                perform = charInacts[getRndm(0, charInacts.length-1)];
+            };
+            scnText = scnText + " " + scnChars[l][0] + " " + perform + ".\n";
+            wholeCast.push(" " + scnChars[l][0]);
+        };
+    };
+
+    //loop rounds and add intro, char movement, environment, outro
+    for (r = actionRounds; r > 0; r--){
+        actionRnd();
+        scnText = scnText + sceneNotes[getRndm(0, sceneNotes.length-1)] + "\n";
+        //come and go
+        if (currentChars == 1){
+            currentChars++;
+        } else if (currentChars == scnChars.length){
+            currentChars--;
+        } else {
+            switch(getRndm(1,3)) {
+                case 1:
+                    currentChars--;
+                    break;
+                case 3:
+                    currentChars++;
+                    break;
+            };
+        };
+        //talk more as it goes
+        for (let x in scnChars){
+            if (scnChars[x][1] < 5){
+                scnChars[x][1]++;
+            };
+        };
+        //end text
+        switch(r) {
+            case 1:
+                scnText = scnText + " End of Scene. \n"
+            break;
+        };
+    };
+
+    wholeStory.push("Scene " + (i+1) + ":\n");
+
+    wholeStory.push(scnText);
+
+    mainCharArray.sort(function(a, b){return 0.5 - Math.random()});
+    sideCharArray.sort(function(a, b){return 0.5 - Math.random()});
+};
+
+
+/////////////////////////////////////////////
+
+
+    function onlyUniq(a) {
+        let uniqueChars = [...new Set(a)];
+        return uniqueChars;
+    };
+    let newList = onlyUniq(wholeCast);
+    let para = document.createElement("p");
+    let node = document.createTextNode("Cast (in order of appearance): ");
+    para.appendChild(node);
+    let element = document.getElementById("div1");
+    element.appendChild(para);
+    let para2 = document.createElement("p");
+    let node2 = document.createTextNode(newList.toString());
+    para.appendChild(node2);
+    let element2 = document.getElementById("div1");
+    element2.appendChild(para2);
+
+
+for (q = 0; q < wholeStory.length; q++){
+    let para = document.createElement("p");
+    let node = document.createTextNode(wholeStory[q]);
+    para.appendChild(node);
+    let element = document.getElementById("div1");
+    element.appendChild(para);
+};
+};
+makeStory();
+
+
+
+    </script>
+</html>
